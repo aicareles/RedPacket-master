@@ -2,36 +2,27 @@ package com.cxk.redpacket;
 
 import android.Manifest;
 import android.arch.lifecycle.Observer;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Handler;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.cxk.redpacket.adapter.BaseAdapter;
 import com.cxk.redpacket.adapter.RedPacketAdapter;
-import com.cxk.redpacket.adapter.ViewHolder;
 import com.cxk.redpacket.base.BaseActivity;
 import com.cxk.redpacket.db.RedPacketDatabase;
 import com.cxk.redpacket.update.UpdateManager;
@@ -41,9 +32,8 @@ import com.cxk.redpacket.utils.SPUtils;
 import com.cxk.redpacket.utils.ThreadUtils;
 import com.cxk.redpacket.utils.Utils;
 import com.jeremyliao.liveeventbus.LiveEventBus;
-import com.pgyersdk.update.PgyUpdateManager;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,35 +63,14 @@ public class MainActivity extends BaseActivity {
         startActivity(intent);
 
         initView();
-
         initData();
-
         initSP();
-
+        initLisenter();
         getTodayDatas();
+        update();
+    }
 
-
-        requestPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                "读写SD卡权限被拒绝,将会影响自动更新版本功能哦!", new GrantedResult() {
-                    @Override
-                    public void onResult(boolean granted) {
-                        if (granted){
-                            update();
-                        }
-                    }
-                });
-
-        /*findViewById(R.id.root).setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_MOVE){
-                    Log.e(TAG, "onTouch: "+event.getX()+"----"+event.getY());
-                    Log.e(TAG, "onTouch222: "+event.getRawX()+"----"+event.getRawY());
-                }
-                return true;
-            }
-        });*/
-
+    private void initLisenter() {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -141,12 +110,46 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        switchReplay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Config.replayEnable = isChecked;
+                SPUtils.put(MainActivity.this, Config.KEY_REPLAY_ENABLE, isChecked);
+            }
+        });
+
+        etReplay.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.e(TAG, "afterTextChanged: "+s.toString());
+                Config.replayMsg = s.toString();
+                SPUtils.put(MainActivity.this, Config.KEY_REPLAY_TEXT, s.toString());
+            }
+        });
+
+        floatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, HistoryRecordActivity.class));
+            }
+        });
+
         LiveEventBus.get(RECEIVE_RED_PACKET, RedPacket.class)
                 .observeSticky(this, new Observer<RedPacket>() {
                     @Override
                     public void onChanged(@Nullable final RedPacket redPacket) {
                         Log.e(TAG, "onChanged: "+redPacket.toString());
-                        currentMoneyTotal+=Double.valueOf(redPacket.getNumber());
+                        currentMoneyTotal = Utils.sum(currentMoneyTotal, Double.valueOf(redPacket.getNumber()));
                         tvTotalMoney.setText("总收入: "+currentMoneyTotal+"元");
                         datas.add(0, redPacket);
                         adapter.notifyDataSetChanged();
@@ -158,16 +161,24 @@ public class MainActivity extends BaseActivity {
                         });
                     }
                 });
+    }
 
-        /*LiveBus.getDefault().<RedPacket>subscribe(RECEIVE_RED_PACKET)
-                .observe(this, new Observer<RedPacket>() {
+    private void update() {
+        requestPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                "读写SD卡权限被拒绝,将会影响自动更新版本功能哦!", new GrantedResult() {
                     @Override
-                    public void onChanged(@Nullable RedPacket redPacket) {
-                        Log.e(TAG, "onChanged: "+redPacket.toString());
-                        datas.add(redPacket);
-                        adapter.notifyDataSetChanged();
+                    public void onResult(boolean granted) {
+                        if (granted){
+                            /*new PgyUpdateManager.Builder()
+                                    .setForced(false)                //设置是否强制更新
+                                    .setUserCanRetry(false)         //失败后是否提示重新下载
+                                    .setDeleteHistroyApk(true)     // 检查更新前是否删除本地历史 Apk
+                                    .register();*/
+                            new UpdateManager(MainActivity.this).versionUpdate();
+                        }
                     }
-                });*/
+                });
     }
 
     private void initSP() {
@@ -198,8 +209,10 @@ public class MainActivity extends BaseActivity {
                 datas.addAll(redPackets);
                 adapter.notifyDataSetChanged();
                 for (RedPacket redPacket: redPackets) {
-                    currentMoneyTotal+=Double.valueOf(redPacket.getNumber());
+                    Log.e(TAG, "callBackUI: "+redPacket.getNumber());
+                    currentMoneyTotal = Utils.sum(currentMoneyTotal, Double.valueOf(redPacket.getNumber()));
                 }
+                Log.e(TAG, "callBackUI: "+currentMoneyTotal);
                 tvTotalMoney.setText("总收入: "+currentMoneyTotal+"元");
             }
         });
@@ -210,49 +223,7 @@ public class MainActivity extends BaseActivity {
         switchReplay = findViewById(R.id.switch_replay);
         tvTotalMoney = findViewById(R.id.tv_total_money);
         floatingButton = findViewById(R.id.floatingButton);
-        switchReplay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Config.replayEnable = isChecked;
-                SPUtils.put(MainActivity.this, Config.KEY_REPLAY_ENABLE, isChecked);
-            }
-        });
-
         etReplay = findViewById(R.id.et_replay);
-        etReplay.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                Log.e(TAG, "afterTextChanged: "+s.toString());
-                Config.replayMsg = s.toString();
-                SPUtils.put(MainActivity.this, Config.KEY_REPLAY_TEXT, s.toString());
-            }
-        });
-
-        floatingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, HistoryRecordActivity.class));
-            }
-        });
-    }
-
-    private void update() {
-        /*new PgyUpdateManager.Builder()
-                .setForced(false)                //设置是否强制更新
-                .setUserCanRetry(false)         //失败后是否提示重新下载
-                .setDeleteHistroyApk(true)     // 检查更新前是否删除本地历史 Apk
-                .register();*/
-        new UpdateManager(this).versionUpdate();
     }
 
     @Override

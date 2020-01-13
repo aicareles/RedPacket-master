@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 
 public class Utils {
 
@@ -39,6 +40,12 @@ public class Utils {
             mToast.setDuration(Toast.LENGTH_SHORT);
         }
         mToast.show();
+    }
+
+    public static double sum(double d1, double d2){
+        BigDecimal bd1 = new BigDecimal(Double.toString(d1));
+        BigDecimal bd2 = new BigDecimal(Double.toString(d2));
+        return bd1.add(bd2).doubleValue();
     }
 
     public static void shareAPK(Activity activity){
