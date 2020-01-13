@@ -37,6 +37,7 @@ import com.cxk.redpacket.db.RedPacketDatabase;
 import com.cxk.redpacket.update.UpdateManager;
 import com.cxk.redpacket.utils.CallBack;
 import com.cxk.redpacket.utils.CallBackUI;
+import com.cxk.redpacket.utils.SPUtils;
 import com.cxk.redpacket.utils.ThreadUtils;
 import com.cxk.redpacket.utils.Utils;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -193,14 +194,18 @@ public class MainActivity extends BaseActivity {
         tvTotalMoney = findViewById(R.id.tv_total_money);
         floatingButton = findViewById(R.id.floatingButton);
         tvTotalMoney.setText("总收入: 0.00元");
+        boolean replay = SPUtils.get(this, Config.KEY_REPLAY_ENABLE, false);
+        switchReplay.setChecked(replay);
         switchReplay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Config.replayEnable = isChecked;
+                SPUtils.put(MainActivity.this, Config.KEY_REPLAY_ENABLE, isChecked);
             }
         });
 
         EditText etReplay = findViewById(R.id.et_replay);
+        Config.replayMsg = SPUtils.get(this, Config.KEY_REPLAY_TEXT, Config.replayMsg);
         etReplay.setText(Config.replayMsg);
         etReplay.addTextChangedListener(new TextWatcher() {
             @Override
@@ -217,6 +222,7 @@ public class MainActivity extends BaseActivity {
             public void afterTextChanged(Editable s) {
                 Log.e(TAG, "afterTextChanged: "+s.toString());
                 Config.replayMsg = s.toString();
+                SPUtils.put(MainActivity.this, Config.KEY_REPLAY_TEXT, s.toString());
             }
         });
 
