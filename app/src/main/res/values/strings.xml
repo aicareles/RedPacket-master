@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">抢红包</string>
+    <string name="desc">由于微信每个版本都会出现不同的id，必须更改寻找控件的id实现点击事件,目前已支持微信最新版本V 7.0.10</string>
+</resources>
