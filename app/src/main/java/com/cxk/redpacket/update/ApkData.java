@@ -1,6 +1,6 @@
 package com.cxk.redpacket.update;
 
-public class ApkInfo {
+public class ApkData {
     private String type;
     private int versionCode;
     private String versionName;

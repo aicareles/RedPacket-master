@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 public class VersionEntity {
     private OutputType outputType;
-    private ApkInfo apkInfo;
+    private ApkData apkData;
     private String path;
 
     public OutputType getOutputType() {
@@ -17,8 +17,8 @@ public class VersionEntity {
         this.outputType = outputType;
     }
 
-    public ApkInfo getApkInfo() {
-        return apkInfo;
+    public ApkData getApkData() {
+        return apkData;
     }
 
     public String getPath() {
@@ -29,8 +29,8 @@ public class VersionEntity {
         this.path = path;
     }
 
-    public void setApkInfo(ApkInfo apkInfo) {
-        this.apkInfo = apkInfo;
+    public void setApkData(ApkData apkData) {
+        this.apkData = apkData;
     }
 
     public static VersionEntity fromJson(String json) {
@@ -43,16 +43,18 @@ public class VersionEntity {
             outputType.setType(outputTypeObject.optString("type"));
             entity.setOutputType(outputType);
 
-            JSONObject apkInfoObject = jsonObject.getJSONObject("apkInfo");
-            ApkInfo apkInfo = new ApkInfo();
-            apkInfo.setType(apkInfoObject.optString("type"));
-            apkInfo.setVersionCode(apkInfoObject.optInt("versionCode"));
-            apkInfo.setVersionName(apkInfoObject.optString("versionName"));
-            apkInfo.setEnabled(apkInfoObject.optBoolean("enabled"));
-            apkInfo.setOutputFile(apkInfoObject.optString("outputFile"));
-            apkInfo.setFullName(apkInfoObject.optString("fullName"));
-            apkInfo.setBaseName(apkInfoObject.getString("baseName"));
-            entity.setApkInfo(apkInfo);
+            JSONObject apkDataObject = jsonObject.getJSONObject("apkData");
+            ApkData apkData = new ApkData();
+            apkData.setType(apkDataObject.optString("type"));
+            apkData.setVersionCode(apkDataObject.optInt("versionCode"));
+            apkData.setVersionName(apkDataObject.optString("versionName"));
+            apkData.setEnabled(apkDataObject.optBoolean("enabled"));
+            apkData.setOutputFile(apkDataObject.optString("outputFile"));
+            apkData.setFullName(apkDataObject.optString("fullName"));
+            apkData.setBaseName(apkDataObject.getString("baseName"));
+            apkData.setSize(apkDataObject.getInt("size"));
+            apkData.setUpdateContent(apkDataObject.getString("updateContent"));
+            entity.setApkData(apkData);
 
             entity.setPath(jsonObject.optString("path"));
 
@@ -71,15 +73,15 @@ public class VersionEntity {
             outputTypeObject.put("type", outputType.getType());
             jsonObject.put("outputType", outputTypeObject);
 
-            JSONObject apkInfoObject = new JSONObject();
-            apkInfoObject.put("type", apkInfo.getType());
-            apkInfoObject.put("versionCode", apkInfo.getVersionCode());
-            apkInfoObject.put("versionName", apkInfo.getVersionName());
-            apkInfoObject.put("enabled", apkInfo.isEnabled());
-            apkInfoObject.put("outputFile", apkInfo.getOutputFile());
-            apkInfoObject.put("fullName", apkInfo.getFullName());
-            apkInfoObject.put("baseName", apkInfo.getBaseName());
-            jsonObject.put("apkInfo", apkInfoObject);
+            JSONObject apkDataObject = new JSONObject();
+            apkDataObject.put("type", apkData.getType());
+            apkDataObject.put("versionCode", apkData.getVersionCode());
+            apkDataObject.put("versionName", apkData.getVersionName());
+            apkDataObject.put("enabled", apkData.isEnabled());
+            apkDataObject.put("outputFile", apkData.getOutputFile());
+            apkDataObject.put("fullName", apkData.getFullName());
+            apkDataObject.put("baseName", apkData.getBaseName());
+            jsonObject.put("apkData", apkDataObject);
 
             jsonObject.put("path", getPath());
         } catch (JSONException e) {

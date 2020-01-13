@@ -19,9 +19,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import com.cxk.redpacket.BuildConfig;
 import com.cxk.redpacket.Config;
 import com.cxk.redpacket.R;
@@ -38,7 +35,6 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -166,13 +162,13 @@ public class UpdateManager {
                 VersionEntity entity = VersionEntity.fromJson(json);
                 int version = AppUtils.getVersionCode(mContext);
                 if (entity != null){
-                    final ApkInfo apkInfo = entity.getApkInfo();
-                    if (apkInfo.getVersionCode() > version){
-                        final String text = mContext.getResources().getString(R.string.find_new_version) + ":" + apkInfo.getVersionCode() + "\n\n" + mContext.getResources().getString(R.string.size) + ":" + ((int) (apkInfo.getSize() / 1024 * 100)) / 100 + "MB\n\n" + apkInfo.getUpdateContent();
+                    final ApkData apkData = entity.getApkData();
+                    if (apkData.getVersionCode() > version){
+                        final String text = mContext.getResources().getString(R.string.find_new_version) + ":" + apkData.getVersionCode() + "\n\n" + mContext.getResources().getString(R.string.size) + ":" + ((int) (apkData.getSize() / 1024 * 100)) / 100 + "MB\n\n" + apkData.getUpdateContent();
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                showNoticeDialog(text, Config.DOWNLOAD_URL, apkInfo.getSize());
+                                showNoticeDialog(text, Config.DOWNLOAD_URL, apkData.getSize());
                             }
                         });
                     }
