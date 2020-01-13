@@ -21,12 +21,12 @@ import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
+import com.cxk.redpacket.utils.LogUtils;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.List;
@@ -82,11 +82,11 @@ public class RedPacketService extends AccessibilityService {
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         int eventType = event.getEventType();
-        Log.e(TAG, "onAccessibilityEvent: eventType:"+eventType);
+        LogUtils.e(TAG, "onAccessibilityEvent: eventType:"+eventType);
         switch (eventType) {
             //通知栏来信息，判断是否含有微信红包字样，是的话跳转
             case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED:
-                Log.e(TAG, "onAccessibilityEvent: text>>>>"+event.toString());
+                LogUtils.e(TAG, "onAccessibilityEvent: text>>>>"+event.toString());
                 List<CharSequence> texts = event.getText();
                 for (CharSequence text : texts) {
                     String content = text.toString();
@@ -107,10 +107,10 @@ public class RedPacketService extends AccessibilityService {
             case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
                 if (TextUtils.isEmpty(event.getClassName()))return;
                 String className = event.getClassName().toString();
-                Log.e(TAG, "onAccessibilityEvent: className:"+className);
+                LogUtils.e(TAG, "onAccessibilityEvent: className:"+className);
                 //判断是否是微信聊天界面
                 if (LAUCHER.equals(className)) {
-                    Log.e(TAG, "onAccessibilityEvent: 微信聊天页面");
+                    LogUtils.e(TAG, "onAccessibilityEvent: 微信聊天页面");
                     //获取当前聊天页面的根布局
                     AccessibilityNodeInfo rootNode = getRootInActiveWindow();
                     //开始找红包
@@ -143,7 +143,7 @@ public class RedPacketService extends AccessibilityService {
     }
 
     private void findMoneyNum(AccessibilityNodeInfo rootNode, RedPacket redPacket) {
-        Log.e(TAG, "详细信息:findMoneyNum:--- "+rootNode.getChildCount() );
+        LogUtils.e(TAG, "详细信息:findMoneyNum:--- "+rootNode.getChildCount() );
         int childCount = rootNode.getChildCount();
         for (int i = 0; i < childCount; i++) {
             AccessibilityNodeInfo node = rootNode.getChild(i);
@@ -157,12 +157,12 @@ public class RedPacketService extends AccessibilityService {
                         }else if (i==2){
                             redPacket.setNumber(node.getText().toString());
                         }
-//                        Log.e(TAG, "findMoneyNum:redPacket>>>> "+redPacket.toString());
+//                        LogUtils.e(TAG, "findMoneyNum:redPacket>>>> "+redPacket.toString());
 //                        LiveBus.getDefault().postEvent(MainActivity.RECEIVE_RED_PACKET, redPacket);
                     }
                 }
             }
-            /*Log.e(TAG, "findMoneyNum: node++++++>>>>>"+node.toString());
+            /*LogUtils.e(TAG, "findMoneyNum: node++++++>>>>>"+node.toString());
             if ("android.widget.TextView".equals(node.getClassName())){
                 if (!TextUtils.isEmpty(node.getText())){
                     String name = node.getText().toString();
@@ -177,10 +177,10 @@ public class RedPacketService extends AccessibilityService {
         /*for (int i = 0; i < rootNode.getChildCount(); i++) {
             AccessibilityNodeInfo node = rootNode.getChild(i);
             if ("android.widget.TextView".equals(node.getClassName())) {
-                Log.e(TAG, "findMoneyNum: TextView-----"+node.toString());
+                LogUtils.e(TAG, "findMoneyNum: TextView-----"+node.toString());
                 if (TextUtils.isEmpty(node.getText()))return;
                 String nodeStr = node.getText().toString();
-                Log.e(TAG, "详细信息: " + nodeStr + i);
+                LogUtils.e(TAG, "详细信息: " + nodeStr + i);
                 RedPacket redPacket = new RedPacket();
                 if (i == 0) {
                     //来自xxx
@@ -190,7 +190,7 @@ public class RedPacketService extends AccessibilityService {
                     redPacket.setMessage(nodeStr);
                 } else if (i == 2 && NumberUtils.isNumber(nodeStr)) {
                     redPacket.setNumber(nodeStr);
-                    Log.e(TAG, "收到红包金额: " + nodeStr);
+                    LogUtils.e(TAG, "收到红包金额: " + nodeStr);
                 }
                 LiveBus.getDefault().postEvent(MainActivity.RECEIVE_RED_PACKET, redPacket);
             }
@@ -206,7 +206,7 @@ public class RedPacketService extends AccessibilityService {
             for (int i = 0; i < rootNode.getChildCount(); i++) {
                 AccessibilityNodeInfo node = rootNode.getChild(i);
                 if ("android.widget.Button".equals(node.getClassName())) {
-                    Log.e(TAG, "openRedPacket: 打开红包>>>>>>");
+                    LogUtils.e(TAG, "openRedPacket: 打开红包>>>>>>");
                     node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
 
                     isOpenDetail = true;
@@ -216,13 +216,13 @@ public class RedPacketService extends AccessibilityService {
         }*/
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         float dpi = metrics.densityDpi;
-        Log.d(TAG, "openPacket！" +  dpi);
+        LogUtils.d(TAG, "openPacket！" +  dpi);
         if (android.os.Build.VERSION.SDK_INT <= 23) {
             if (rootNode != null) {
                 for (int i = 0; i < rootNode.getChildCount(); i++) {
                     AccessibilityNodeInfo node = rootNode.getChild(i);
                     if ("android.widget.Button".equals(node.getClassName())) {
-                        Log.e(TAG, "openRedPacket: 打开红包>>>>>>");
+                        LogUtils.e(TAG, "openRedPacket: 打开红包>>>>>>");
                         node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                         isOpenDetail = true;
                     }
@@ -246,7 +246,7 @@ public class RedPacketService extends AccessibilityService {
             dispatchGesture(gestureDescription, new GestureResultCallback() {
                 @Override
                 public void onCompleted(GestureDescription gestureDescription) {
-                    Log.d(TAG, "onCompleted");
+                    LogUtils.d(TAG, "onCompleted");
                     isOpenDetail = true;
 //                    mMutex = false;
                     super.onCompleted(gestureDescription);
@@ -254,7 +254,7 @@ public class RedPacketService extends AccessibilityService {
 
                 @Override
                 public void onCancelled(GestureDescription gestureDescription) {
-                    Log.d(TAG, "onCancelled");
+                    LogUtils.d(TAG, "onCancelled");
 //                    mMutex = false;
                     super.onCancelled(gestureDescription);
                 }
@@ -276,7 +276,7 @@ public class RedPacketService extends AccessibilityService {
                     continue;
                 }
                 CharSequence text = node.getText();
-                Log.e(TAG, "rootNode  text:"+text);
+                LogUtils.e(TAG, "rootNode  text:"+text);
                 if (text != null && text.toString().equals("微信红包")) {
                     AccessibilityNodeInfo parent = node.getParent();
                     //while循环,遍历"领取红包"的各个父布局，直至找到可点击的为止
@@ -295,7 +295,7 @@ public class RedPacketService extends AccessibilityService {
                         replayText(node, Config.replayMsg);
                         //发送
                         findAndPerformAction(UI.BUTTON, "发送");
-                        Log.e(TAG, "自动回复消息成功");
+                        LogUtils.e(TAG, "自动回复消息成功");
                     }
                 }
                 //判断是否已经打开过那个最新的红包了，是的话就跳出for循环，不是的话继续遍历
@@ -334,7 +334,7 @@ public class RedPacketService extends AccessibilityService {
 
     private void replayText(AccessibilityNodeInfo node, String reply) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Log.i(TAG, "set text");
+            LogUtils.i(TAG, "set text");
             Bundle args = new Bundle();
             args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
                     reply);
@@ -416,7 +416,7 @@ public class RedPacketService extends AccessibilityService {
     private boolean isScreenOn() {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         isScreenOn = pm.isScreenOn();
-        Log.e("isScreenOn", isScreenOn + "");
+        LogUtils.e("isScreenOn", isScreenOn + "");
         return isScreenOn;
     }
 

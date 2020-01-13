@@ -58,6 +58,7 @@ public class MainActivity extends BaseActivity {
     private ListView listView;
     private Switch switchReplay;
     private TextView tvTotalMoney;
+    private EditText etReplay;
     private FloatingActionButton floatingButton;
     private RedPacketAdapter adapter;
     private List<RedPacket> datas;
@@ -72,11 +73,13 @@ public class MainActivity extends BaseActivity {
         startActivity(intent);
 
         initView();
-        datas = new ArrayList<>();
+
+        initData();
+
+        initSP();
 
         getTodayDatas();
-        adapter = new RedPacketAdapter(this, datas);
-        listView.setAdapter(adapter);
+
 
         requestPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 "读写SD卡权限被拒绝,将会影响自动更新版本功能哦!", new GrantedResult() {
@@ -167,6 +170,20 @@ public class MainActivity extends BaseActivity {
                 });*/
     }
 
+    private void initSP() {
+        boolean replay = SPUtils.get(this, Config.KEY_REPLAY_ENABLE, false);
+        Config.replayEnable = replay;
+        switchReplay.setChecked(replay);
+        Config.replayMsg = SPUtils.get(this, Config.KEY_REPLAY_TEXT, Config.replayMsg);
+        etReplay.setText(Config.replayMsg);
+    }
+
+    private void initData() {
+        datas = new ArrayList<>();
+        adapter = new RedPacketAdapter(this, datas);
+        listView.setAdapter(adapter);
+    }
+
     private void getTodayDatas() {
         ThreadUtils.asyncThreadCallback(new CallBackUI<List<RedPacket>>() {
             @Override
@@ -193,9 +210,6 @@ public class MainActivity extends BaseActivity {
         switchReplay = findViewById(R.id.switch_replay);
         tvTotalMoney = findViewById(R.id.tv_total_money);
         floatingButton = findViewById(R.id.floatingButton);
-        tvTotalMoney.setText("总收入: 0.00元");
-        boolean replay = SPUtils.get(this, Config.KEY_REPLAY_ENABLE, false);
-        switchReplay.setChecked(replay);
         switchReplay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -204,9 +218,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        EditText etReplay = findViewById(R.id.et_replay);
-        Config.replayMsg = SPUtils.get(this, Config.KEY_REPLAY_TEXT, Config.replayMsg);
-        etReplay.setText(Config.replayMsg);
+        etReplay = findViewById(R.id.et_replay);
         etReplay.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
