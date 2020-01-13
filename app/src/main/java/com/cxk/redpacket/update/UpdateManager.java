@@ -164,7 +164,7 @@ public class UpdateManager {
                 if (entity != null){
                     final ApkData apkData = entity.getApkData();
                     if (apkData.getVersionCode() > version){
-                        final String text = mContext.getResources().getString(R.string.find_new_version) + ":" + apkData.getVersionCode() + "\n\n" + mContext.getResources().getString(R.string.size) + ":" + apkData.getSize() / 1024 + "MB\n\n" + apkData.getUpdateContent();
+                        final String text = mContext.getResources().getString(R.string.find_new_version) + ":" + apkData.getVersionName() + "\n\n" + mContext.getResources().getString(R.string.size) + ":" + apkData.getSize() / 1024 + "MB\n\n" + apkData.getUpdateContent();
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {

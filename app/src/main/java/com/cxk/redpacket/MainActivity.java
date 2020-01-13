@@ -67,8 +67,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-//        startActivity(intent);
+        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        startActivity(intent);
 
         initView();
         datas = new ArrayList<>();
