@@ -1,4 +1,18 @@
 <resources>
     <string name="app_name">抢红包</string>
     <string name="desc">由于微信每个版本都会出现不同的id，必须更改寻找控件的id实现点击事件,目前已支持微信最新版本V 7.0.10</string>
+
+
+
+    <string name="sure">确定</string>
+    <string name="cancel">取消</string>
+    <string name="total_size">文件大小：%1$.2fMB</string>
+    <string name="find_new_version">发现新版本</string>
+    <string name="size">大小</string>
+    <string name="update_title">应用更新</string>
+
+    <string name="down_fail">安装包下载失败，请检查网络</string>
+    <string name="retry">重试</string>
+    <string name="remind_later">稍后提醒</string>
+    <string name="download_url_error">下载地址不正确</string>
 </resources>

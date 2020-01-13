@@ -22,14 +22,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        /*customDebugType {
-            debuggable true
-        }*/
     }
 
     android.applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "抢红包-v${defaultConfig.versionName}.apk"
+            outputFileName = "Red-Packet.apk"
         }
     }
 
@@ -49,6 +46,8 @@ dependencies {
 
     implementation "io.reactivex.rxjava2:rxandroid:2.1.0"
     implementation "io.reactivex.rxjava2:rxjava:2.2.5"
+    implementation 'com.squareup.okhttp3:okhttp:4.0.1'
+    implementation 'com.alibaba:fastjson:1.2.49'
 
     implementation 'com.pgyersdk:sdk:3.0.10'
 //    implementation 'com.github.aicareles.components:baselib:1.0.2'

@@ -10,4 +10,7 @@ public class Config {
 
     public static final String KEY_REDPACKET_LIST = "key_redpacket_list";
 
+    public static final String VERSION_UPDATE = "https://raw.githubusercontent.com/aicareles/RedPacket-master/master/app/release/output.json";
+    public static final String DOWNLOAD_URL = "https://raw.githubusercontent.com/aicareles/RedPacket-master/master/app/release/Red-Packet.apk";
+
 }

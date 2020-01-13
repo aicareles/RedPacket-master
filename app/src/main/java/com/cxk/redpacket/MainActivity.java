@@ -34,6 +34,7 @@ import com.cxk.redpacket.adapter.RedPacketAdapter;
 import com.cxk.redpacket.adapter.ViewHolder;
 import com.cxk.redpacket.base.BaseActivity;
 import com.cxk.redpacket.db.RedPacketDatabase;
+import com.cxk.redpacket.update.UpdateManager;
 import com.cxk.redpacket.utils.CallBack;
 import com.cxk.redpacket.utils.CallBackUI;
 import com.cxk.redpacket.utils.ThreadUtils;
@@ -66,8 +67,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-        startActivity(intent);
+//        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+//        startActivity(intent);
 
         initView();
         datas = new ArrayList<>();
@@ -228,11 +229,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void update() {
-        new PgyUpdateManager.Builder()
+        /*new PgyUpdateManager.Builder()
                 .setForced(false)                //设置是否强制更新
                 .setUserCanRetry(false)         //失败后是否提示重新下载
                 .setDeleteHistroyApk(true)     // 检查更新前是否删除本地历史 Apk
-                .register();
+                .register();*/
+        new UpdateManager(this).versionUpdate();
     }
 
     @Override
